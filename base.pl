@@ -20,32 +20,26 @@ occur_check(X, T)
 
 /* Définition quelle regle appliquer en fonction de l'équation */
 
-regle(rename_r, X ?= T) 
+regle(X ?= T, rename_r) 
 :- var(X), var(T).
 
-regle(simplify_r, X ?= T) 
+regle(X ?= T, simplify_r) 
 :- var(X), const(T).
 
-regle(expand_r, X ?= T) 
+regle(X ?= T, expand_r) 
 :- var(X), fonc(T), \+occur_check(X, T).
 
-regle(check_r, X ?= T) 
+regle(X ?= T, check_r) 
 :- var(X), X \= T, occur_check(X, T).
 
-regle(orient_r, T ?= X) 
+regle(T ?= X, orient_r) 
 :- var(X), \+var(T).
 
-regle(decompose_r, X ?= T)
+regle(X ?= T, decompose_r)
 :- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 = A2, N1 = N2.
 
-regle(clash_r, X ?= T) 
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 \= A2, N1 \= N2.
-
-regle(clash_r, X ?= T) 
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), N1 \= N2.
-
-regle(clash_r, X ?= T) 
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 \= A2.
+regle(X ?= T, clash_r) 
+:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), (A1 \= A2 ; N1 \= N2).
 
 
 
