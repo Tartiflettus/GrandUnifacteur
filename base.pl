@@ -52,6 +52,32 @@ rename_p(X, Y, Lin, [Z ?= T | Lout])
 :- rename_p(X, Y, [Z ?= T | Lin], Lout).
 
 
+
+
+
+/* check */
+
+
+false
+:- check_p(P,S).
+
+
+
+/* orient */
+
+orient ([X ?= T | P], S)
+:- orient ([T ?= X | P], S).
+
+
+/* decompose */
+
+
+
+/* clash */
+
+false
+:- clash_p(P,S).
+
 /* Transforme P (couples) en Q (couples) en appliquant R (règle) sur E (équation tête de P) */
 
 
