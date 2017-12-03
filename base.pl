@@ -53,12 +53,17 @@ rename_p(X, Y, Lin, [Z ?= T | Lout])
 
 
 
+/* Transforme P (couples) en Q (couples) en appliquant R (règle) sur E (équation tête de P) */
+
+
+
+
 
 
 /* check */
 
 
-false
+fail
 :- check_p(P,S).
 
 
@@ -75,12 +80,26 @@ orient ([X ?= T | P], S)
 
 /* clash */
 
-false
+fail
 :- clash_p(P,S).
 
-/* Transforme P (couples) en Q (couples) en appliquant R (règle) sur E (équation tête de P) */
+
+
+/* Essais 03/12/2017 */
+
+/*check */
+reduit(check_r, X ?= T, P, [fail | Q])
+:- reduit(check_r, E, [X ?= T | P], Q]).
+
+
+reduit(orient_r, T ?= X, [X ?= T | P], Q)
+:- reduit(orient_r, E, [T ?= X | P], Q).
 
 
 
+/* unifie*/
 
+unifie([]).
 
+unifie(P)
+:- unifie([X ?= T, P]), regle(X ?= T, R), reduit(R, X ?= T, P, Q).
