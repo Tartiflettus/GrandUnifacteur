@@ -49,60 +49,53 @@ regle(X ?= T, clash_r)
 /* règles de transformation */
 
 /* X: variable à renommer, Y: terme qui remplace X, L: liste où remplacer */
-rename_p(X, Y, [], Lout).
+/*rename_p(X, Y, [], Lout).
 
 rename_p(X, Y, Lin, [Z ?= T | Lout])
-:- rename_p(X, Y, [Z ?= T | Lin], Lout).
-
-
-
-/* Transforme P (couples) en Q (couples) en appliquant R (règle) sur E (équation tête de P) */
-
-
-
-
-
-
-/* check */
-
-
-/*fail
-:- check_p(P,S).*/
-
-
-
-/* orient */
-
-orient ([X ?= T | P], S)
-:- orient ([T ?= X | P], S).
-
-
-/* decompose */
-
-
-
-/* clash */
-
-/*fail
-:- clash_p(P,S).*/
+:- rename_p(X, Y, [Z ?= T | Lin], Lout).*/
 
 
 
 /* Essais 03/12/2017 */
 
 /*check */
-reduit(check_r, E, bottom, bottom)
+reduit(check_r, E, _, bottom)
 :- regle(E, check_r).
 
+/*clash*/
+reduit(clash_r, E, _, bottom)
+:- regle(E, clash_r).
 
-reduit(orient_r, T ?= X, [X ?= T | P], Q)
-:- reduit(orient_r, E, [T ?= X | P], Q).
+
+%comment interroger
+%reduit(orient_r, t ?= X, P, Q).
+
+
+/*orient*/
+reduit(orient_r, T ?= X, [X ?= T | _], _)
+:- regle(T ?= X, orient_r).
+
+
+
+/*rename*/
+%reduit(rename_r, X ?= T, [X ?= T | P], Q)
 
 
 
 /* unifie*/
 
+%unifie([X ?= t, X ?= f(X)]). %question
+
 unifie([]).
 
-unifie(P)
-:- unifie([X ?= T, P]), reduit(R, X ?= T, P, Q).
+unifie([E | P])
+:- unifie(P), reduit(_, E, P, Q), Q \= bottom.
+
+
+
+
+
+
+
+
+
