@@ -13,7 +13,10 @@ const(X)
 /* Vérifie si X apparait dans T */
 
 occur_check(X, T)
-:- var(X), term_variables(T, Arguments), member(X, Arguments).
+:- var(X), term_variables(T, Arguments), occur_check_list(X, Arguments), !.
+
+occur_check_list(X, [E | List])
+:- var(X), same_term(X, E) ; occur_check(X, List).
 
 
 
@@ -21,25 +24,25 @@ occur_check(X, T)
 /* Définition quelle regle appliquer en fonction de l'équation */
 
 regle(X ?= T, rename_r) 
-:- var(X), var(T).
+:- var(X), var(T), !.
 
 regle(X ?= T, simplify_r) 
-:- var(X), const(T).
+:- var(X), const(T), !.
 
 regle(X ?= T, expand_r) 
-:- var(X), fonc(T), \+occur_check(X, T).
+:- var(X), fonc(T), \+occur_check(X, T), !.
 
 regle(X ?= T, check_r) 
-:- var(X), X \= T, occur_check(X, T).
+:- var(X), fonc(T), occur_check(X, T), !.
 
 regle(T ?= X, orient_r) 
-:- var(X), \+var(T).
+:- var(X), \+var(T), !.
 
 regle(X ?= T, decompose_r)
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 = A2, N1 = N2.
+:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 = A2, N1 = N2, !.
 
 regle(X ?= T, clash_r) 
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), (A1 \= A2 ; N1 \= N2).
+:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), (A1 \= A2 ; N1 \= N2), !.
 
 
 
@@ -63,8 +66,8 @@ rename_p(X, Y, Lin, [Z ?= T | Lout])
 /* check */
 
 
-fail
-:- check_p(P,S).
+/*fail
+:- check_p(P,S).*/
 
 
 
@@ -80,16 +83,16 @@ orient ([X ?= T | P], S)
 
 /* clash */
 
-fail
-:- clash_p(P,S).
+/*fail
+:- clash_p(P,S).*/
 
 
 
 /* Essais 03/12/2017 */
 
 /*check */
-reduit(check_r, X ?= T, P, [fail | Q])
-:- reduit(check_r, E, [X ?= T | P], Q]).
+reduit(check_r, E, bottom, bottom)
+:- regle(E, check_r).
 
 
 reduit(orient_r, T ?= X, [X ?= T | P], Q)
@@ -102,4 +105,4 @@ reduit(orient_r, T ?= X, [X ?= T | P], Q)
 unifie([]).
 
 unifie(P)
-:- unifie([X ?= T, P]), regle(X ?= T, R), reduit(R, X ?= T, P, Q).
+:- unifie([X ?= T, P]), reduit(R, X ?= T, P, Q).
