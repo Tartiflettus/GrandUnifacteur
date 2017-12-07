@@ -72,13 +72,25 @@ reduit(clash_r, E, _, bottom)
 
 
 /*orient*/
-reduit(orient_r, T ?= X, [X ?= T | _], _)
+reduit(orient_r, T ?= X, _, [X ?= T | _])
 :- regle(T ?= X, orient_r).
 
 
 
 /*rename*/
-%reduit(rename_r, X ?= T, [X ?= T | P], Q)
+%reduit(rename_r, X ?= T, P, [Q | X ?= T])
+:- regle(T ?= X, rename_r) .
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -87,6 +99,8 @@ reduit(orient_r, T ?= X, [X ?= T | _], _)
 %unifie([X ?= t, X ?= f(X)]). %question
 
 unifie([]).
+
+%\+unifie(bottom).
 
 unifie([E | P])
 :- unifie(P), reduit(_, E, P, Q), Q \= bottom.
