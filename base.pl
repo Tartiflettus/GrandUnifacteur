@@ -26,7 +26,7 @@ regle(X ?= T, rename_r)
 :- var(X), var(T), !.
 
 regle(X ?= T, simplify_r) 
-:- ((var(X), const(T)) ; (X==T)), !.
+:- ((var(X), const(T)) ; (X==T, const(T))), !.
 
 regle(X ?= T, expand_r) 
 :- var(X), fonc(T), \+occur_check(X, T), !.
@@ -56,7 +56,7 @@ reduit(simplify_r, X ?= T, P, Q)
 :- append(P, [], Q), X = T.
 
 /*expand*/
-reduit(rename_r, X ?= T, P, Q)
+reduit(expand_r, X ?= T, P, Q)
 :- append(P, [], Q), X = T.
 
 /*check */
@@ -97,7 +97,7 @@ unifie([E | P])
 unifie([X ?= b]) réponse X = b
 unifie([X ?= X]) réponse true
 unifie([X ?= f(X)]) réponse false
-unifie([X ?= f(a)]) réponse false --------------
+unifie([X ?= f(a)]) X=f(a)
 
 unifie([a ?= a]) réponse true
 unifie([a ?= b]) réponse false
