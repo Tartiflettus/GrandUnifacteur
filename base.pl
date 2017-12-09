@@ -102,7 +102,13 @@ reduit(clash_r, _, _, bottom).
 
 /* Unifie */
 
+unifie(P, choix_premier)
+:- choix_premier(P, Q, E, R).
 
+unifie(P, choix_pondere)
+:- choix_pondere(P, Q, E, R).
+
+/* Unifie(P) */
 unifie([]).
 
 unifie([E | P])
@@ -112,6 +118,7 @@ unifie([E | P])
 /* 
 unifie([X ?= b]) réponse X = b
 unifie([X ?= X]) réponse true
+unifie([X ?= Y]) réponse X = Y
 unifie([X ?= f(X)]) réponse false
 unifie([X ?= f(a)]) X=f(a)
 
@@ -123,7 +130,14 @@ unifie([f(X) ?= X]) reponse false
 unifie([f(X) ?= a]) reponse false
 unifie([f(X) ?= f(a)]) false
 unifie([f(X) ?= f(X)]) false ??????????????
+unifie([f(a) ?= f(a)]) false ??????????????
 unifie([f(X, k) ?= f(X,n)]) false
+
+
+unifie([f(a, X) ?= f(a, b)]) false -----------------
+unifie([f(X) ?= f(Y)]) false ----------------
+unifie([f(X) ?= f(g(Y))]) false --------------
+unifie([f(X) ?= f(X,Y)]) false
 
 */
 
