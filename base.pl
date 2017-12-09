@@ -54,10 +54,10 @@ regle(T ?= X, orient_r)
 :- var(X), \+var(T), !.
 
 regle(X ?= T, decompose_r)
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 == A2, N1 =\= N2, !.
+:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 =:= A2, N1 == N2, !.
 
 regle(X ?= T, clash_r) 
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), (A1 \== A2 ; N1 =\= N2), !.
+:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), (A1 =\= A2 ; N1 \== N2), !.
 
 
 
@@ -121,9 +121,9 @@ unifie([a ?= f(a)]) réponse false
 
 unifie([f(X) ?= X]) reponse false
 unifie([f(X) ?= a]) reponse false
-unifie([f(X) ?= f(a)]) erreur --------------
-unifie([f(X) ?= f(X)]) erreur --------------
-unifie([f(X, k) ?= f(X,n)]) erreur --------------
+unifie([f(X) ?= f(a)]) false
+unifie([f(X) ?= f(X)]) false ??????????????
+unifie([f(X, k) ?= f(X,n)]) false
 
 */
 
