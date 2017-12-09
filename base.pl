@@ -99,15 +99,6 @@ reduit(clash_r, _, _, bottom).
 
 
 
-
-/* Unifie */
-
-unifie(P, choix_premier)
-:- choix_premier(P, Q, E, R).
-
-unifie(P, choix_pondere)
-:- choix_pondere(P, Q, E, R).
-
 /* Unifie(P) */
 unifie([]).
 
@@ -115,7 +106,22 @@ unifie([E | P])
 :- regle(E, R), reduit(R, E, P, Q), unifie(Q). 
 
 
-/* 
+/* Unifie */
+
+unifie(P, choix_premier)
+:- choix_premier(P, Q, _, _).
+
+unifie(P, choix_pondere)
+:- choix_pondere(P, Q, _, _).
+
+
+/* choix_premier */
+choix_premier([E | P], Q, _, _)
+:- regle(E, R), reduit(R, E, P, Q), unifie(Q). 
+
+
+
+/* tests 
 unifie([X ?= b]) réponse X = b
 unifie([X ?= X]) réponse true
 unifie([X ?= Y]) réponse X = Y
