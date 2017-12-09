@@ -108,6 +108,8 @@ unifie([E | P])
 
 /* Unifie */
 
+unifie(P, _).
+
 unifie(P, choix_premier)
 :- choix_premier(P, Q, _, _).
 
