@@ -8,10 +8,6 @@ fonc(X)
 const(X)
 :- nonvar(X), functor(X, _, 0).
 
-pasunif(X)
-:- var(X) ; const(X) ; fonc(X).
-
-
 
 /* Vérifie si X apparait dans T */
 
@@ -42,43 +38,77 @@ regle(T ?= X, orient_r)
 :- var(X), \+var(T), !.
 
 regle(X ?= T, decompose_r)
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 = A2, N1 = N2, !.
+:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), A1 == A2, N1 =\= N2, !.
 
 regle(X ?= T, clash_r) 
-:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), (A1 \= A2 ; N1 \= N2), !.
+:- fonc(X), fonc(T), functor(X, N1, A1), functor(T, N2, A2), (A1 \== A2 ; N1 =\= N2), !.
 
 
 
-/* règles de transformation */
+/* règles de tran/formation */
 
-/* X: variable à renommer, Y: terme qui remplace X, L: liste où remplacer */
-/*rename_p(X, Y, [], Lout).
+/* rename_r */
+reduit(rename_r, X ?= T, P, Q)
+:- append(P, [], Q), X = T.
 
-rename_p(X, Y, Lin, [Z ?= T | Lout])
-:- rename_p(X, Y, [Z ?= T | Lin], Lout).*/
+/*simplify*/
+reduit(simplify_r, X ?= T, P, Q)
+:- append(P, [], Q), X = T.
 
-
-
-/* Essais 03/12/2017 */
+/*expand*/
+reduit(rename_r, X ?= T, P, Q)
+:- append(P, [], Q), X = T.
 
 /*check */
 %fonctionne
 reduit(check_r, _, _, bottom).
 
+/*orient*/
+%fonctionne
+reduit(orient_r, T ?= X, [T ?= X | P], [X ?= T | P]).
+
+/*decompose*/
+reduit(decompose_r, X ?= T, [X ?= T | P], Pout)
+:- X =.. [_ |F], T =.. [_ |G], decompose_aux(F, G, Q), append(P, Q, Pout).
+
+	/*Lout reçoit des équations entre les éléments de L1 et L2*/
+	decompose_aux([], [], _).
+
+	decompose_aux([X1 | L1], [X2 | L2], Lout)
+	:- decompose_aux(L1, L2, Lout), memberchk(X1 ?= X2, Lout).
 
 /*clash*/
 %fonctionne
 reduit(clash_r, _, _, bottom).
 
 
-/*orient*/
-%fonctionne
-reduit(orient_r, T ?= X, [T ?= X | P], [X ?= T | P]).
 
 
-/*decompose*/
-reduit(decompose_r, X ?= T, [X ?= T | P], Pout)
-:- X =.. [_ |F], T =.. [_ |G], decompose_aux(F, G, Q), append(P, Q, Pout).
+/* Unifie */
+
+
+unifie([]).
+
+unifie([E | P])
+:- regle(E, R), reduit(R, E, P, Q), unifie(Q). 
+
+
+/* 
+unifie([X ?= b]) réponse X = b
+unifie([X ?= X]) réponse true
+unifie([X ?= f(X)]) réponse false
+unifie([X ?= f(a)]) réponse false --------------
+
+unifie([a ?= a]) réponse false --------------
+unifie([a ?= b]) réponse false
+unifie([a ?= f(a)]) réponse false
+
+unifie([f(X) ?= X]) reponse false
+unifie([f(X) ?= a]) reponse false
+unifie([f(X) ?= f(a)]) erreur --------------
+unifie([f(X) ?= f(X)]) erreur --------------
+
+*/
 
 
 /*rename*/
@@ -105,13 +135,13 @@ reduit(decompose_r, X ?= T, [X ?= T | P], Pout)
 
 
 rename_terme(X, T, Terme, T)
-:- var(X), same_term(X, Terme).
+:- X == Terme.
 
 rename_terme(X, _, Terme, Terme)
-:- var(X), \+same_term(X, Terme), \+fonc(Terme).
+:- X \== Terme, \+fonc(Terme).
 
 rename_terme(X, T, Terme, Sortie)
-:- var(X), \+same_term(X, Terme), fonc(Terme), Terme=..Liste, rename_list(X, T, Liste, ListeSortie), Sortie=..ListeSortie.
+:- X \== Terme, fonc(Terme), Terme=..Liste, rename_list(X, T, Liste, ListeSortie), Sortie=..ListeSortie.
 
 
 rename_list(_, _, [], _).
@@ -136,16 +166,6 @@ Terme=..Liste, rename_list(X, T, Liste, ListeSortie), Sortie=..ListeSortie, !.
 */
 
 
-/*Lout reçoit des équations entre les éléments de L1 et L2*/
-decompose_aux([], [], _).
-
-
-decompose_aux([X1 | L1], [X2 | L2], Lout)
-:- decompose_aux(L1, L2, Lout), memberchk(X1 ?= X2, Lout).
-
-
-
-
 
 
 /* unifie*/
@@ -153,10 +173,10 @@ decompose_aux([X1 | L1], [X2 | L2], Lout)
 %unifie([X ?= t, X ?= f(X)]). %question
 %unifie([X ?= t, Y = X]). %question
 
-unifie([]).
+%unifie([]).
 
-unifie([E | P])
-:- unifie(P), reduit(_, E, P, Q), Q \= bottom.
+%unifie([E | P])
+%:- unifie(P), reduit(_, E, P, Q), Q \= bottom.
 
 
 
