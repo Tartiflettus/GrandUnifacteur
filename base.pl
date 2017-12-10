@@ -65,15 +65,15 @@ regle(X ?= T, clash_r)
 
 /* rename_r */
 reduit(rename_r, X ?= T, P, Q)
-:- append(P, [], Q), X = T.
+:- append(P, [], Q), X = T, !.
 
 /*simplify*/
 reduit(simplify_r, X ?= T, P, Q)
-:- append(P, [], Q), X = T.
+:- append(P, [], Q), X = T, !.
 
 /*expand*/
 reduit(expand_r, X ?= T, P, Q)
-:- append(P, [], Q), X = T.
+:- append(P, [], Q), X = T, !.
 
 /*check */
 %fonctionne
