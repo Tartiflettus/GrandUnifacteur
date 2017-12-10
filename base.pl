@@ -81,10 +81,10 @@ reduit(check_r, _, _, bottom).
 
 /*orient*/
 %fonctionne
-reduit(orient_r, T ?= X, [T ?= X | P], [X ?= T | P]).
+reduit(orient_r, T ?= X, P, [X ?= T | P]).
 
 /*decompose*/
-reduit(decompose_r, X ?= T, [X ?= T | P], Pout)
+reduit(decompose_r, X ?= T, P, Pout)
 :- X =.. [_ |F], T =.. [_ |G], decompose_aux(F, G, Q), append(P, Q, Pout).
 
 	/*Lout reçoit des équations entre les éléments de L1 et L2*/
@@ -136,15 +136,18 @@ unifie([a ?= f(a)]) réponse false
 
 unifie([f(X) ?= X]) reponse false
 unifie([f(X) ?= a]) reponse false
-unifie([f(X) ?= f(a)]) false
-unifie([f(X) ?= f(X)]) false ??????????????
-unifie([f(a) ?= f(a)]) false ??????????????
+unifie([f(X) ?= f(a)]) X = a
+unifie([f(X) ?= f(X)]) true
+unifie([f(a) ?= f(a)]) true
 unifie([f(X, k) ?= f(X,n)]) false
+unifie([f(a) ?= f(X)]) X = a
+
+unifie([f(a, b) ?= f(X, Y)]) X = a    Y = b
 
 
-unifie([f(a, X) ?= f(a, b)]) false -----------------
-unifie([f(X) ?= f(Y)]) false ----------------
-unifie([f(X) ?= f(g(Y))]) false --------------
+unifie([f(a, X) ?= f(a, b)]) X =b
+unifie([f(X) ?= f(Y)]) X = Y
+unifie([f(X) ?= f(g(Y))]) X = g(Y)
 unifie([f(X) ?= f(X,Y)]) false
 
 */
