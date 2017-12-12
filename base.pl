@@ -1,5 +1,9 @@
 /* Prédicats utiles */
 
+delete_p(X, [E | P], Q) :- X \== E, append([E], Q1, Q), delete_p(X, P, Q1), !.
+delete_p(X, [E | P], Q) :- X == E, delete_p(X, P, Q).
+delete_p(_, [], []).
+
 :- op(20,xfy,?=).
 
 fonc(X)
@@ -21,7 +25,7 @@ clr_echo :- retractall(echo_on).
 % echo(T): si le flag echo_on est positionné, echo(T) affiche le terme T
 %          sinon, echo(T) réussit simplement en ne faisant rien.
 
-echo(T) :- echo_on, !, write(T).
+echo(T) :- echo_on, !, writeln(T).
 echo(_).
 
 
@@ -103,20 +107,35 @@ reduit(decompose_r, X ?= T, P, Pout)
 unifie([]).
 
 unifie([E | P])
-:- regle(E, R), reduit(R, E, P, Q), unifie(Q). 
+:- regle(E, R), reduit(R, E, P, Q), unifie(Q), !. 
 
 
 /* Unifie */
+unifie([], _).
+
+
 unifie(P, choix_premier)
-:- choix_premier(P, Q, E, R), reduit(R, E, Q, Q1), unifie(Q1), !.
+:- choix_premier(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E),
+unifie(Q1, choix_premier), !.
+
+
+/*unifie([E | P], choix_premier)
+:- regle(E, R), reduit(R, E, P, Q), unifie(Q, choix_premier), !.*/
+
+
 
 unifie(P, choix_pondere)
-:- choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), unifie(Q1), !.
+:- choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E),
+unifie(Q1, choix_pondere), !.
+
+
+trace_unif(P, S)
+:- set_echo, unifie(P, S), clr_echo.
 
 
 /* choix_premier */
 choix_premier([E | P], P, E, R)
-:- regle(E, R). 
+:- regle(E, R), !. 
 
 
 /*
@@ -130,7 +149,7 @@ clash, check > rename, simplify > orient > decompose > expand
 /* choix_pondere */
 choix_pondere(P, Q, E, R)
 :- ( extrait_clash_check(P, E, R); extrait_rename_simplify(P, E, R); extrait_orient(P, E, R); extrait_decompose(P, E, R); extrait_expand(P, E, R) ),
-select(E, P, Q), !.
+delete_p(E, P, Q), !.
 
 /*clash et check */
 extrait_clash_check([E | _], E, R)
