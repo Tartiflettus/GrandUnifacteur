@@ -9,12 +9,13 @@ const(X)
 :- nonvar(X), functor(X, _, 0).
 
 
-% Prédicats d'affichage fournis
+:- dynamic echo_on/0.
+% Prédicats d affichage fournis
 
-% set_echo: ce prédicat active l'affichage par le prédicat echo
+% set_echo: ce prédicat active l affichage par le prédicat echo
 set_echo :- assert(echo_on).
 
-% clr_echo: ce prédicat inhibe l'affichage par le prédicat echo
+% clr_echo: ce prédicat inhibe l affichage par le prédicat echo
 clr_echo :- retractall(echo_on).
 
 % echo(T): si le flag echo_on est positionné, echo(T) affiche le terme T
@@ -76,12 +77,13 @@ reduit(expand_r, X ?= T, P, Q)
 :- append(P, [], Q), X = T, !.
 
 /*check */
-%fonctionne
 reduit(check_r, _, _, bottom).
 
 /*orient*/
-%fonctionne
 reduit(orient_r, T ?= X, P, [X ?= T | P]).
+
+/*clash*/
+reduit(clash_r, _, _, bottom).
 
 /*decompose*/
 reduit(decompose_r, X ?= T, P, Pout)
@@ -93,9 +95,7 @@ reduit(decompose_r, X ?= T, P, Pout)
 	decompose_aux([X1 | L1], [X2 | L2], Lout)
 	:- decompose_aux(L1, L2, Lout), memberchk(X1 ?= X2, Lout).
 
-/*clash*/
-%fonctionne
-reduit(clash_r, _, _, bottom).
+
 
 
 
@@ -107,19 +107,75 @@ unifie([E | P])
 
 
 /* Unifie */
-
-unifie(P, _).
-
 unifie(P, choix_premier)
-:- choix_premier(P, Q, _, _).
+:- choix_premier(P, Q, E, R), reduit(R, E, Q, Q1), unifie(Q1), !.
 
 unifie(P, choix_pondere)
-:- choix_pondere(P, Q, _, _).
+:- choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), unifie(Q1), !.
 
 
 /* choix_premier */
-choix_premier([E | P], Q, _, _)
-:- regle(E, R), reduit(R, E, P, Q), unifie(Q). 
+choix_premier([E | P], P, E, R)
+:- regle(E, R). 
+
+
+/*
+exemple d'appel: 
+choix_pondere([x ?= f(X), Y ?= a], Q, E, R).
+
+
+clash, check > rename, simplify > orient > decompose > expand
+*/
+
+/* choix_pondere */
+choix_pondere(P, Q, E, R)
+:- ( extrait_clash_check(P, E, R); extrait_rename_simplify(P, E, R); extrait_orient(P, E, R); extrait_decompose(P, E, R); extrait_expand(P, E, R) ),
+select(E, P, Q), !.
+
+/*clash et check */
+extrait_clash_check([E | _], E, R)
+:- ( regle(E, clash_r) ; regle(E, check_r) ), regle(E, R).
+
+extrait_clash_check([E | P], ESortie, RSortie)
+:- \+regle(E, clash_r), \+regle(E, check_r), 
+extrait_clash_check(P, ESortie, RSortie).
+
+/* rename et simplify */
+extrait_rename_simplify([E | _], E, R)
+:- ( regle(E, rename_r) ; regle(E, simplify_r) ), regle(E, R).
+
+extrait_rename_simplify([E | P], ESortie, RSortie)
+:- \+regle(E, rename_r), \+regle(E, simplify_r), 
+extrait_clash_check(P, ESortie, RSortie).
+
+/* orient */
+extrait_orient([E | _], E, orient_r)
+:- regle(E, orient_r).
+
+extrait_orient([E | P], ESortie, RSortie)
+:- \+regle(E, orient_r), 
+extrait_orient(P, ESortie, RSortie).
+
+/* decompose */
+extrait_decompose([E | _], E, decompose_r)
+:- regle(E, decompose_r).
+
+extrait_decompose([E | P], ESortie, RSortie)
+:- \+regle(E, decompose_r), 
+extrait_decompose(P, ESortie, RSortie).
+
+/* expand */
+extrait_expand([E | _], E, expand_r)
+:- regle(E, expand_r).
+
+extrait_expand([E | P], ESortie, RSortie)
+:- \+regle(E, expand_r), 
+extrait_expand(P, ESortie, RSortie).
+
+
+
+
+
 
 
 
