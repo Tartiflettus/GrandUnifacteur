@@ -1,16 +1,25 @@
 /* Prédicats utiles */
 
-delete_p(X, [E | P], Q) :- X \== E, append([E], Q1, Q), delete_p(X, P, Q1), !.
-delete_p(X, [E | P], Q) :- X == E, delete_p(X, P, Q).
-delete_p(_, [], []).
 
 :- op(20,xfy,?=).
+
 
 fonc(X)
 :- nonvar(X), functor(X, _, A), A > 0 .
 
+
 const(X)
 :- nonvar(X), functor(X, _, 0).
+
+
+delete_p(_, [], []).
+
+delete_p(X, [E | P], Qout) 
+:- X \== E, append([E], Q, Qout), delete_p(X, P, Q), !.
+
+delete_p(X, [E | P], Q) 
+:- X == E, delete_p(X, P, Q).
+
 
 
 :- dynamic echo_on/0.
@@ -123,19 +132,28 @@ unifie(Q1, choix_premier), !.
 :- regle(E, R), reduit(R, E, P, Q), unifie(Q, choix_premier), !.*/
 
 
-
 unifie(P, choix_pondere)
 :- choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E),
 unifie(Q1, choix_pondere), !.
 
 
-trace_unif(P, S)
-:- set_echo, unifie(P, S), clr_echo.
-
 
 /* choix_premier */
 choix_premier([E | P], P, E, R)
 :- regle(E, R), !. 
+
+
+
+
+
+
+/* affichages exécution */
+trace_unif(P, S)
+:- set_echo, unifie(P, S), clr_echo.
+
+unif(P, S)
+:- unifie(P, S).
+
 
 
 /*
