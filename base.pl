@@ -155,12 +155,12 @@ unifie(Q1, choix_aleatoire), !.
 /* affichages exécution */
 /* trace_unif(P, S) appelle unifie(P, S) et autorise l'affichage des echo(T) présents dans ce-dernier. */
 trace_unif(P, S)
-:- set_echo, unifie(P, S), clr_echo.
+:- set_echo, unifie(P, S), clr_echo, !.
 
 
 /* unif(P, S) appelle unifie(P, S) mais n'autorise pas l'affichage des echo(T) présents dans ce-dernier. */
 unif(P, S)
-:- clr_echo, unifie(P, S).
+:- clr_echo, unifie(P, S), !.
 
 
 
