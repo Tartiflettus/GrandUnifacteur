@@ -103,10 +103,10 @@ reduit(decompose_r, X ?= T, P, Pout)
 :- X =.. [_ |F], T =.. [_ |G], decompose_aux(F, G, Q), append(P, Q, Pout).
 
 	/*Lout reçoit des équations entre les éléments de L1 et L2*/
-	decompose_aux([], [], _).
+	decompose_aux([], [], []).
 
 	decompose_aux([X1 | L1], [X2 | L2], Lout)
-	:- decompose_aux(L1, L2, Lout), memberchk(X1 ?= X2, Lout).
+	:- decompose_aux(L1, L2, Q), append([X1 ?= X2], Q, Lout).
 
 
 
@@ -133,7 +133,7 @@ unifie(Q1, choix_premier), !.
 
 
 unifie(P, choix_pondere)
-:- choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E),
+:- echo(appelunifkkkkkkkkkkkkkkkkkkkkkkkkkk), choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E), echo(sortie: Q1),
 unifie(Q1, choix_pondere), !.
 
 
@@ -152,7 +152,7 @@ trace_unif(P, S)
 :- set_echo, unifie(P, S), clr_echo.
 
 unif(P, S)
-:- unifie(P, S).
+:- clr_echo, unifie(P, S).
 
 
 
