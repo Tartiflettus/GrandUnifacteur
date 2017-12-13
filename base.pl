@@ -1,17 +1,25 @@
-/* Prédicats utiles */
 
+
+
+/* UNIFICATION DE MARTELLI-MONTANARI */
+
+
+/* Prédicats utiles */
 
 :- op(20,xfy,?=).
 
 
+/* Predicat qui sert à vérifier si un terme est une fonction */
 fonc(X)
 :- nonvar(X), functor(X, _, A), A > 0 .
 
 
+/* Predicat qui sert à vérifier si un terme est une constante */
 const(X)
 :- nonvar(X), functor(X, _, 0).
 
 
+/* Predicat qui trouve toutes les occurences de E dans P et qui les supprimes pour donner le nouveau système Q. select et delete de prolog n'effectuent pas l'opération demandée*/
 delete_p(_, [], []).
 
 delete_p(X, [E | P], Qout) 
@@ -37,10 +45,11 @@ clr_echo :- retractall(echo_on).
 echo(T) :- echo_on, !, writeln(T).
 echo(_).
 
+/* Nous avons légerement modifié le prédicat echo(T) pour qu'il fasse automatiquement les retours à la ligne après l'appel de chaque echo(T) */
+
 
 
 /* Vérifie si X apparait dans T */
-
 occur_check(X, T)
 :- var(X), term_variables(T, Arguments), occur_check_list(X, Arguments), !.
 
@@ -50,7 +59,9 @@ occur_check_list(X, [E | List])
 
 
 
-/* Définition quelle regle appliquer en fonction de l'équation */
+/* REGLES : détermine la règle de transformation R qui s’applique à l’équation E 
+Le nom d'une règle est défini ainsi : X_r (ex : rename_r)
+*/
 
 regle(X ?= T, rename_r) 
 :- var(X), var(T), !.
@@ -75,9 +86,10 @@ regle(X ?= T, clash_r)
 
 
 
-/* règles de tran/formation */
+/* REDUIT : transforme le système d’équations P en le système d’équations Q par application de la règle de transformation R à l’équation E. */
+/* On produit la constante bottom à la place de la liste de sortie lors d'un clash ou check, pour que bottom ne soit unifiable avec aucune liste par la suite */
 
-/* rename_r */
+/* rename */
 reduit(rename_r, X ?= T, P, Q)
 :- append(P, [], Q), X = T, !.
 
@@ -102,7 +114,7 @@ reduit(clash_r, _, _, bottom).
 reduit(decompose_r, X ?= T, P, Pout)
 :- X =.. [_ |F], T =.. [_ |G], decompose_aux(F, G, Q), append(P, Q, Pout).
 
-	/*Lout reçoit des équations entre les éléments de L1 et L2*/
+	/*Lout est la liste des équations créées à partir des éléments présents dans les listes L1 et L2*/
 	decompose_aux([], [], []).
 
 	decompose_aux([X1 | L1], [X2 | L2], Lout)
@@ -110,16 +122,18 @@ reduit(decompose_r, X ?= T, P, Pout)
 
 
 
+/* Unifie(P) : utilise les prédicats regle(E, R) et reduit(R, E, P, Q) et effectue l'unification de Martelli-Montanari sur la liste d'équations P.
+unifie(P) correspond à unifie(P, choix_premier) défini par la suite */
 
-
-/* Unifie(P) */
 unifie([]).
 
 unifie([E | P])
 :- regle(E, R), reduit(R, E, P, Q), unifie(Q), !. 
 
 
-/* Unifie(P,S) */
+/* Unifie(P,S) : effectue l'unification de Martelli-Montanari sur la liste d'équations P en utilisant la stratégie S
+S peut prendre comme valeur "choix_premier", "choix_pondere" ou "choix_aleatoire"
+*/
 unifie([], _).
 
 unifie(P, choix_premier)
@@ -139,21 +153,30 @@ unifie(Q1, choix_aleatoire), !.
 
 
 /* affichages exécution */
+/* trace_unif(P, S) appelle unifie(P, S) et autorise l'affichage des echo(T) présents dans ce-dernier. */
 trace_unif(P, S)
 :- set_echo, unifie(P, S), clr_echo.
 
+
+/* unif(P, S) appelle unifie(P, S) mais n'autorise pas l'affichage des echo(T) présents dans ce-dernier. */
 unif(P, S)
 :- clr_echo, unifie(P, S).
 
 
 
-/* choix_premier */
+
+/* choix_premier : sélectionne le premier élément E du système P et retourne le nouveau sytème P \ {E}, l'élément E sélectionné et la règle R à appliquer sur cet élément E */
 choix_premier([E | P], P, E, R)
 :- regle(E, R), !. 
 
 
 
-/* choix_pondere */
+/* choix_pondere : 
+on donne maintenant un poid à chaque règle selon le modèle suivant : clash, check > rename, simplify > orient > decompose > expand
+ainsi, clash et check sont prioritaires par rapport aux règles rename et simplify ... etc ...
+On va donc chercher, dans le système P, l'élément E sur lequel la règle R avec la plus forte priorité peut s'appliquer.
+On retourne cet élement E et sa règle associée R, ainsi que le nouveau système Q, où Q = P \ {E}. 
+*/
 choix_pondere(P, Q, E, R)
 :- ( extrait_clash_check(P, E, R); extrait_rename_simplify(P, E, R); extrait_orient(P, E, R); extrait_decompose(P, E, R); extrait_expand(P, E, R) ),
 delete_p(E, P, Q), !.
@@ -200,7 +223,7 @@ delete_p(E, P, Q), !.
     extrait_expand(P, ESortie, RSortie).
     
 
-/* choix_aleatoire */
+/* choix_aleatoire : sélectionne aléatoirement un élément E du système P et retourne le nouveau sytème P \ {E}, l'élément E sélectionné et la règle R à appliquer sur cet élément E*/
 
 choix_aleatoire(P, Q, E, R)
 :- random_member(E, P), regle(E, R), delete_p(E, P, Q), !.
@@ -208,7 +231,7 @@ choix_aleatoire(P, Q, E, R)
 
 
 
-/* tests 
+/* TESTS
 unifie([X ?= b]) réponse X = b
 unifie([X ?= X]) réponse true
 unifie([X ?= Y]) réponse X = Y
