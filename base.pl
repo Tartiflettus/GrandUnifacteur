@@ -169,6 +169,7 @@ choix_pondere(P, Q, E, R)
 :- ( extrait_clash_check(P, E, R); extrait_rename_simplify(P, E, R); extrait_orient(P, E, R); extrait_decompose(P, E, R); extrait_expand(P, E, R) ),
 delete_p(E, P, Q), !.
 
+
 /*clash et check */
 extrait_clash_check([E | _], E, R)
 :- ( regle(E, clash_r) ; regle(E, check_r) ), regle(E, R).
@@ -183,7 +184,7 @@ extrait_rename_simplify([E | _], E, R)
 
 extrait_rename_simplify([E | P], ESortie, RSortie)
 :- \+regle(E, rename_r), \+regle(E, simplify_r), 
-extrait_clash_check(P, ESortie, RSortie).
+extrait_rename_simplify(P, ESortie, RSortie).
 
 /* orient */
 extrait_orient([E | _], E, orient_r)
