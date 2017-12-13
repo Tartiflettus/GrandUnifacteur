@@ -119,31 +119,22 @@ unifie([E | P])
 :- regle(E, R), reduit(R, E, P, Q), unifie(Q), !. 
 
 
-/* Unifie */
+/* Unifie(P,S) */
 unifie([], _).
-
 
 unifie(P, choix_premier)
 :- choix_premier(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E),
 unifie(Q1, choix_premier), !.
 
 
-/*unifie([E | P], choix_premier)
-:- regle(E, R), reduit(R, E, P, Q), unifie(Q, choix_premier), !.*/
-
-
 unifie(P, choix_pondere)
-:- echo(appelunifkkkkkkkkkkkkkkkkkkkkkkkkkk), choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E), echo(sortie: Q1),
+:- choix_pondere(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E),
 unifie(Q1, choix_pondere), !.
 
 
-
-/* choix_premier */
-choix_premier([E | P], P, E, R)
-:- regle(E, R), !. 
-
-
-
+unifie(P, choix_aleatoire)
+:- choix_aleatoire(P, Q, E, R), reduit(R, E, Q, Q1), echo(system: P), echo(R: E),
+unifie(Q1, choix_aleatoire), !.
 
 
 
@@ -156,13 +147,11 @@ unif(P, S)
 
 
 
-/*
-exemple d'appel: 
-choix_pondere([x ?= f(X), Y ?= a], Q, E, R).
+/* choix_premier */
+choix_premier([E | P], P, E, R)
+:- regle(E, R), !. 
 
 
-clash, check > rename, simplify > orient > decompose > expand
-*/
 
 /* choix_pondere */
 choix_pondere(P, Q, E, R)
@@ -170,49 +159,51 @@ choix_pondere(P, Q, E, R)
 delete_p(E, P, Q), !.
 
 
-/*clash et check */
-extrait_clash_check([E | _], E, R)
-:- ( regle(E, clash_r) ; regle(E, check_r) ), regle(E, R).
+    /*clash et check */
+    extrait_clash_check([E | _], E, R)
+    :- ( regle(E, clash_r) ; regle(E, check_r) ), regle(E, R).
 
-extrait_clash_check([E | P], ESortie, RSortie)
-:- \+regle(E, clash_r), \+regle(E, check_r), 
-extrait_clash_check(P, ESortie, RSortie).
+    extrait_clash_check([E | P], ESortie, RSortie)
+    :- \+regle(E, clash_r), \+regle(E, check_r), 
+    extrait_clash_check(P, ESortie, RSortie).
 
-/* rename et simplify */
-extrait_rename_simplify([E | _], E, R)
-:- ( regle(E, rename_r) ; regle(E, simplify_r) ), regle(E, R).
+    /* rename et simplify */
+    extrait_rename_simplify([E | _], E, R)
+    :- ( regle(E, rename_r) ; regle(E, simplify_r) ), regle(E, R).
 
-extrait_rename_simplify([E | P], ESortie, RSortie)
-:- \+regle(E, rename_r), \+regle(E, simplify_r), 
-extrait_rename_simplify(P, ESortie, RSortie).
+    extrait_rename_simplify([E | P], ESortie, RSortie)
+    :- \+regle(E, rename_r), \+regle(E, simplify_r), 
+    extrait_rename_simplify(P, ESortie, RSortie).
 
-/* orient */
-extrait_orient([E | _], E, orient_r)
-:- regle(E, orient_r).
+    /* orient */
+    extrait_orient([E | _], E, orient_r)
+    :- regle(E, orient_r).
 
-extrait_orient([E | P], ESortie, RSortie)
-:- \+regle(E, orient_r), 
-extrait_orient(P, ESortie, RSortie).
+    extrait_orient([E | P], ESortie, RSortie)
+    :- \+regle(E, orient_r), 
+    extrait_orient(P, ESortie, RSortie).
 
-/* decompose */
-extrait_decompose([E | _], E, decompose_r)
-:- regle(E, decompose_r).
+    /* decompose */
+    extrait_decompose([E | _], E, decompose_r)
+    :- regle(E, decompose_r).
 
-extrait_decompose([E | P], ESortie, RSortie)
-:- \+regle(E, decompose_r), 
-extrait_decompose(P, ESortie, RSortie).
+    extrait_decompose([E | P], ESortie, RSortie)
+    :- \+regle(E, decompose_r), 
+    extrait_decompose(P, ESortie, RSortie).
 
-/* expand */
-extrait_expand([E | _], E, expand_r)
-:- regle(E, expand_r).
+    /* expand */
+    extrait_expand([E | _], E, expand_r)
+    :- regle(E, expand_r).
 
-extrait_expand([E | P], ESortie, RSortie)
-:- \+regle(E, expand_r), 
-extrait_expand(P, ESortie, RSortie).
+    extrait_expand([E | P], ESortie, RSortie)
+    :- \+regle(E, expand_r), 
+    extrait_expand(P, ESortie, RSortie).
+    
 
+/* choix_aleatoire */
 
-
-
+choix_aleatoire(P, Q, E, R)
+:- random_member(E, P), regle(E, R), delete_p(E, P, Q), !.
 
 
 
@@ -245,80 +236,4 @@ unifie([f(X) ?= f(g(Y))]) X = g(Y)
 unifie([f(X) ?= f(X,Y)]) false
 
 */
-
-
-/*rename*/
-/*reduit(rename_r, X ?= T, [X ?= T | P], Q)
-:- rename_aux(X, T, P, Q).*/
-
-/*rename_aux(_, _, [], _).*/ /*on s arrete quand c est vide*/
-
-/* cas où X = X1 et T = T1 */
-/*rename_aux(X, T, [X1 ?= T1| Pin], [T ?= T |Pout])
-:- same_term(X, X1), same_term(X, T1).*/
-
-/* cas où X = X1 */
-/*rename_aux(X, T, [X1 ?= T1| Pin], [T ?= T |Pout])
-:- same_term(X, X1), \+same_term(X, T1).*/
-
-/* cas où T = T1 */
-/*rename_aux(X, T, [X1 ?= T1| Pin], [X1 ?= T |Pout])
-:- \+same_term(X, X1), same_term(X, T1).*/
-
-/* cas où il n'y a rien à rename */
-/*rename_aux(X, T, [X1 ?= T1| Pin], [X1 ?= T1 |Pout])
-:- \+same_term(X, X1), \+same_term(X, T1).*/
-
-
-rename_terme(X, T, Terme, T)
-:- X == Terme.
-
-rename_terme(X, _, Terme, Terme)
-:- X \== Terme, \+fonc(Terme).
-
-rename_terme(X, T, Terme, Sortie)
-:- X \== Terme, fonc(Terme), Terme=..Liste, rename_list(X, T, Liste, ListeSortie), Sortie=..ListeSortie.
-
-
-rename_list(_, _, [], _).
-
-rename_list(X, T, [E | Lin], [Eout | Lout])
-:- rename_terme(X, T, E, Eout), rename_list(X, T, Lin, [Eout | Lout]).
-
-
-/*
-rename_terme(X, T, Terme, T)
-:- var(X), var(Terme), same_term(X, Terme), !.
-
-rename_terme(X, _, Terme, Terme)
-:- var(X), var(Terme), \+same_term(X, Terme), !.
-
-rename_terme(X, _, Terme, Terme)
-:- var(X), nonvar(Terme), \+same_term(X, Terme), \+fonc(Terme), !.
-
-rename_terme(X, T, Terme, Sortie)
-:- var(X), nonvar(Terme), \+same_term(X, Terme), fonc(Terme), 
-Terme=..Liste, rename_list(X, T, Liste, ListeSortie), Sortie=..ListeSortie, !.
-*/
-
-
-
-
-/* unifie*/
-
-%unifie([X ?= t, X ?= f(X)]). %question
-%unifie([X ?= t, Y = X]). %question
-
-%unifie([]).
-
-%unifie([E | P])
-%:- unifie(P), reduit(_, E, P, Q), Q \= bottom.
-
-
-
-% select/4 éventuellement pour rename
-
-
-
-
 
