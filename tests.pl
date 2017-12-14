@@ -1,5 +1,4 @@
 /* tests de fonc(X) */
-
 ?- fonc(f(a)).
 true.
 
@@ -12,15 +11,8 @@ false.
 ?- fonc(X).
 false.
 
-?- fonc().
-ERROR: Syntax error: Unexpected end of clause
-ERROR: fonc() 
-ERROR: ** here **
-ERROR: .
-
 
 /* tests de const(X) */
-
 ?- const(a).
 true.
 
@@ -33,17 +25,8 @@ false.
 ?- const(f(X)).
 false.
 
-?- const().
-ERROR: Syntax error: Unexpected end of clause
-ERROR: const() 
-ERROR: ** here **
-ERROR: .
-
-
 
 /* tests de delete_p(Elem, Lin, Lout) */
-
-
 ?- delete_p(a, [a, b, c], Lout).
 Lout = [b, c].
 
@@ -66,10 +49,7 @@ Lout = [a, b].
 Lout = [a, b].
 
 
-
 /* tests de occur_check(X, T) */
-
-
 ?- occur_check(X, f(X)).
 true.
 
@@ -83,9 +63,7 @@ true.
 false.
 
 
-
 /*tests des règles */
-
 /* rename */
 ?- regle(X ?=T, R).
 R = rename_r.
@@ -101,8 +79,6 @@ false.
 
 
 /* simplify */
-
-
 ?- regle(X ?=t, R).
 R = simplify_r.
 
@@ -117,7 +93,6 @@ false.
 
 
 /* expand */
-
 ?- regle(X ?=f(t), R).
 R = expand_r.
 
@@ -132,7 +107,6 @@ false.
 
 
 /* check */
-
 ?- regle(X ?= f(X), R).
 R = check_r.
 
@@ -147,7 +121,6 @@ true.
 
 
 /* orient */
-
 ?- regle(t ?= X, R).
 R = orient_r.
 
@@ -162,7 +135,6 @@ false.
 
 
 /* decompose */
-
 ?- regle(f(t) ?= f(X), R).
 R = decompose_r.
 
@@ -180,7 +152,6 @@ false.
 
 
 /* clash */
-
 ?- regle(f(t) ?= g(X, a), R).
 R = clash_r.
 
@@ -197,10 +168,7 @@ false.
 true.
 
 
-
-
 /* tests reduit */
-
 /* rename */
 ?- reduit(rename_r, X ?= T, [], Q).
 X = T,
@@ -212,7 +180,6 @@ Q = [f(T)?=T].
 
 
 /* simplify */
-
 ?- reduit(simplify_r, X ?= t, [], Q).
 X = t,
 Q = [].
@@ -223,7 +190,6 @@ Q = [f(t)?=t].
 
 
 /* expand */
-
 ?- reduit(expand_r, X ?= f(t), [], Q).
 X = f(t),
 Q = [].
@@ -234,7 +200,6 @@ Q = [f(f(t))?=f(t)].
 
 
 /* check */
-
 ?- reduit(check_r, X ?= f(t, Y, X, k), [], Q).
 Q = bottom.
 
@@ -243,7 +208,6 @@ Q = bottom.
 
 
 /* orient */
-
 ?- reduit(orient_r, t ?= X, [], Q).
 Q = [X?=t].
 
@@ -252,7 +216,6 @@ Q = [X?=t, f(X)?=X].
 
 
 /* clash */
-
 ?- reduit(clash_r, f(t) ?= g(X), [], Q).
 Q = bottom.
 
@@ -264,7 +227,6 @@ Q = bottom.
 
 
 /* decompose */
-
 ?- reduit(decompose_r, f(t, C, X) ?= f(X, k, Y), [], Q).
 Q = [t?=X, C?=k, X?=Y].
 
@@ -272,9 +234,7 @@ Q = [t?=X, C?=k, X?=Y].
 Q = [f(X)?=X, t?=X].
 
 
-
 /* unifie(P) */
-
 ?- unifie([X ?= b]).
 X = b.
 
@@ -336,7 +296,6 @@ X = g(Y).
 ?- unifie([f(X) ?= f(X,Y)]).
 false.
 
-
 ?- unifie([f(X, Y) ?= f(g(Z), h(a)), Z ?= f(Y)]).
 X = g(f(h(a))),
 Y = h(a),
@@ -347,7 +306,6 @@ false.
 
 
 /* tests trace_unif(P, S) */
-
 /* choix premier */
 ?- trace_unif([Z ?= f(Y), f(X, Y) ?= f(g(Z), h(a))], choix_premier).
 system:[f(_G4306)?=f(_G4306),f(_G4314,_G4306)?=f(g(f(_G4306)),h(a))]
