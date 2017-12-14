@@ -1,8 +1,3 @@
-% https://www.overleaf.com/dash
-% victor.creusel@gmail.com
-% mdp ; PLATQUISEMANGEFROID
-
-
 /* UNIFICATION DE MARTELLI-MONTANARI */
 
 
