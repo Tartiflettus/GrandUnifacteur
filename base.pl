@@ -22,13 +22,13 @@ const(X)
 
 
 /* Predicat qui trouve toutes les occurences de E dans P et qui les supprimes pour donner le nouveau système Q. select et delete de prolog n'effectuent pas l'opération demandée*/
-delete_p(_, [], []).
+delete_p(_, [], []) :- !.
 
 delete_p(X, [E | P], Qout) 
 :- X \== E, append([E], Q, Qout), delete_p(X, P, Q), !.
 
 delete_p(X, [E | P], Q) 
-:- X == E, delete_p(X, P, Q).
+:- X == E, delete_p(X, P, Q), !.
 
 
 
@@ -226,39 +226,6 @@ delete_p(E, P, Q), !.
     
 
 /* choix_aleatoire : sélectionne aléatoirement un élément E du système P et retourne le nouveau sytème P \ {E}, l'élément E sélectionné et la règle R à appliquer sur cet élément E*/
-
 choix_aleatoire(P, Q, E, R)
 :- random_member(E, P), regle(E, R), delete_p(E, P, Q), !.
-
-
-
-
-/* TESTS
-unifie([X ?= b]) réponse X = b
-unifie([X ?= X]) réponse true
-unifie([X ?= Y]) réponse X = Y
-unifie([X ?= f(X)]) réponse false
-unifie([X ?= f(a)]) X=f(a)
-
-unifie([a ?= a]) réponse true
-unifie([a ?= b]) réponse false
-unifie([a ?= f(a)]) réponse false
-
-unifie([f(X) ?= X]) reponse false
-unifie([f(X) ?= a]) reponse false
-unifie([f(X) ?= f(a)]) X = a
-unifie([f(X) ?= f(X)]) true
-unifie([f(a) ?= f(a)]) true
-unifie([f(X, k) ?= f(X,n)]) false
-unifie([f(a) ?= f(X)]) X = a
-
-unifie([f(a, b) ?= f(X, Y)]) X = a    Y = b
-
-
-unifie([f(a, X) ?= f(a, b)]) X =b
-unifie([f(X) ?= f(Y)]) X = Y
-unifie([f(X) ?= f(g(Y))]) X = g(Y)
-unifie([f(X) ?= f(X,Y)]) false
-
-*/
 
